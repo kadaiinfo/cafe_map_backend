@@ -9,6 +9,12 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 import os
+import time
+import subprocess
+from dotenv import load_dotenv
+
+# 環境変数を読み込み
+load_dotenv()
 
 # ログ設定
 logging.basicConfig(
@@ -24,7 +30,7 @@ logger = logging.getLogger(__name__)
 class MediaUrlUpdater:
     def __init__(self):
         # Instagram API設定
-        self.ACCESS_TOKEN = "IGAASNrIOurLFBZAFAxZA2YzbEpWYjJHUktoQkVlYnI3T0RNSl9ucEg3QXdDSF9JUnZApUUtoSXQxZAlZAtdGg1UUUxNkRmZA21vSDNYbUhYSlpsNWhYTWZAHMC1ZAZAzRzZA2twY2RFeXlWdmQ1bDJadDVqd05hS1Y0ZAWhBNmN3ZAVdDd2RIdwZDZD"
+        self.ACCESS_TOKEN = os.getenv('INSTAGRAM_ACCESS_TOKEN', "IGAASNrIOurLFBZAFAxZA2YzbEpWYjJHUktoQkVlYnI3T0RNSl9ucEg3QXdDSF9JUnZApUUtoSXQxZAlZAtdGg1UUUxNkRmZA21vSDNYbUhYSlpsNWhYTWZAHMC1ZAZAzRzZA2twY2RFeXlWdmQ1bDJadDVqd05hS1Y0ZAWhBNmN3ZAVdDd2RIdwZDZD")
         self.IG_USER_ID = "24958190963767720"
         self.HOST = "graph.instagram.com"
         self.fields = "id,caption,media_type,media_url,permalink,timestamp,username,like_count,comments_count,media_product_type"

@@ -1,0 +1,1 @@
+npx wrangler kv:key get --namespace-id=51e44551ce024a58aa0cc2f84e419ccd cafe_data_kv.json
