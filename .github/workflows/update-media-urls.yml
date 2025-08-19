@@ -52,7 +52,7 @@ jobs:
           echo "Error: CLOUDFLARE_KV_NAMESPACE_ID is not set"
           exit 1
         fi
-        wrangler kv key put cafe_data_kv.json --path=cafe_data_kv.json --namespace-id="$CLOUDFLARE_KV_NAMESPACE_ID"
+        wrangler kv key put cafe_data_kv.json --path=cafe_data_kv.json --namespace-id="$CLOUDFLARE_KV_NAMESPACE_ID" --remote
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
