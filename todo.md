@@ -1,1 +1,5 @@
-npx wrangler kv:key get --namespace-id=51e44551ce024a58aa0cc2f84e419ccd cafe_data_kv.json
+update_media_urls.pyで取得したinstagram_posts.jsonには、cafe_data_kv.jsonに含まれない店舗情報が含まれる
+その含まれない店舗情報のみを、gemini.pyとget_geodata.pyを通すことで、cafe_data_kv.jsonに含める用意したい。
+
+
+
