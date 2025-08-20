@@ -2,13 +2,13 @@ import json
 import os
 import time
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 import requests
 import urllib.parse
 import re
 
 load_dotenv()
-client = genai.Client(api_key=os.environ.get('GOOGLE_AI_API_KEY'))
+genai.configure(api_key=os.environ.get('GOOGLE_AI_API_KEY'))
 
 def find_new_stores():
     """instagram_posts.jsonとcafe_data_kv.jsonを比較して新しい店舗IDを特定"""
@@ -50,10 +50,8 @@ def extract_store_info(caption):
     {{"store_name": null, "address": null}}
     """
     
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+    response = model.generate_content(prompt)
     
     try:
         result = json.loads(response.text.strip().replace('```json', '').replace('```', ''))
