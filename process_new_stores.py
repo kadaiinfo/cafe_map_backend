@@ -110,19 +110,29 @@ def process_new_stores():
         
         # 投稿から店舗情報を抽出
         if 'caption' in post and post['caption']:
-            store_info = extract_store_info(post['caption'])
-            time.sleep(7)  # API制限対策
+            try:
+                store_info = extract_store_info(post['caption'])
+                if not isinstance(store_info, dict):
+                    print(f"  エラー: store_infoが辞書ではありません: {type(store_info)}")
+                    store_info = {"store_name": None, "address": None}
+                time.sleep(7)  # API制限対策
+            except Exception as e:
+                print(f"  店舗情報抽出エラー: {e}")
+                store_info = {"store_name": None, "address": None}
         else:
             store_info = {"store_name": None, "address": None}
         
         # 座標を取得
         lat, lng = None, None
-        if store_info['address']:
+        if isinstance(store_info, dict) and store_info.get('address'):
             lat, lng = get_coordinates(store_info['address'])
             time.sleep(0.5)  # API制限対策
         
         # 店舗名と住所が両方取得できた場合のみ追加
-        if store_info['store_name'] and store_info['address'] and lat and lng:
+        if (isinstance(store_info, dict) and 
+            store_info.get('store_name') and 
+            store_info.get('address') and 
+            lat and lng):
             processed_store = {
                 'id': post['id'],
                 'store_name': store_info['store_name'],
