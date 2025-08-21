@@ -10,6 +10,19 @@ import re
 load_dotenv()
 genai.configure(api_key=os.environ.get('GOOGLE_AI_API_KEY'))
 
+def load_skipped_posts():
+    """スキップされた投稿IDのリストを読み込み"""
+    try:
+        with open('skipped_posts.json', 'r', encoding='utf-8') as f:
+            return set(json.load(f))
+    except FileNotFoundError:
+        return set()
+
+def save_skipped_posts(skipped_ids):
+    """スキップされた投稿IDのリストを保存"""
+    with open('skipped_posts.json', 'w', encoding='utf-8') as f:
+        json.dump(list(skipped_ids), f, ensure_ascii=False, indent=2)
+
 def find_new_stores():
     """instagram_posts.jsonとcafe_data_kv.jsonを比較して新しい店舗IDを特定"""
     with open('instagram_posts.json', 'r', encoding='utf-8') as f:
@@ -18,18 +31,20 @@ def find_new_stores():
     with open('cafe_data_kv.json', 'r', encoding='utf-8') as f:
         cafe_data = json.load(f)
     
-    # cafe_data_kv.jsonにあるIDのセットを作成
+    # 既存店舗IDとスキップ済みIDのセットを作成
     existing_ids = set(store['id'] for store in cafe_data)
+    skipped_ids = load_skipped_posts()
     
-    # instagram_posts.jsonから新しい投稿のみを抽出
+    # instagram_posts.jsonから新しい投稿のみを抽出（既存・スキップ済みを除外）
     new_posts = []
     for post in instagram_posts:
-        if post['id'] not in existing_ids:
+        if post['id'] not in existing_ids and post['id'] not in skipped_ids:
             new_posts.append(post)
     
     print(f"既存店舗数: {len(existing_ids)}")
+    print(f"スキップ済み投稿数: {len(skipped_ids)}")
     print(f"Instagram投稿数: {len(instagram_posts)}")
-    print(f"新規店舗数: {len(new_posts)}")
+    print(f"新規処理対象数: {len(new_posts)}")
     
     return new_posts
 
@@ -104,6 +119,7 @@ def process_new_stores():
         return
     
     processed_stores = []
+    skipped_ids = load_skipped_posts()
     
     for i, post in enumerate(new_posts):
         print(f"処理中 {i+1}/{len(new_posts)}: {post['id']}")
@@ -152,6 +168,8 @@ def process_new_stores():
             print(f"  追加: {store_info['store_name']} - {store_info['address']}")
         else:
             print(f"  スキップ: 店舗情報または座標が不完全")
+            # スキップされた投稿IDを記録
+            skipped_ids.add(post['id'])
     
     # cafe_data_kv.jsonに追加
     if processed_stores:
@@ -166,6 +184,10 @@ def process_new_stores():
         print(f"\n{len(processed_stores)}件の新しい店舗をcafe_data_kv.jsonに追加しました。")
     else:
         print("\n追加できる新しい店舗はありませんでした。")
+    
+    # スキップリストを保存
+    save_skipped_posts(skipped_ids)
+    print(f"スキップリストに{len(skipped_ids) - len(load_skipped_posts())}件追加しました。")
 
 if __name__ == "__main__":
     process_new_stores()
